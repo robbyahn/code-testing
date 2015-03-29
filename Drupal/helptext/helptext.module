@@ -1,0 +1,96 @@
+<?php
+    /**
+    * Implements hook_field_info().
+    *
+    * Provides the description of the field.
+    */
+   function helptext_field_info() {
+     return array(
+       // We name our field as the associative name of the array.
+       'helptext_model' => array(
+         'label' => t('Helptext field'),
+         'description' => t('helptext description'),
+         'default_widget' => 'helptext_text',
+         'default_formatter' => 'helptext_default_formatter',
+       ),
+     );
+   }
+   
+   function helptext_field_is_empty($item, $field) {
+    return empty($item['helpdescription']);
+   }
+       
+   /**
+    * Implements hook_field_formatter_info().
+    *
+    * @see helptext_field_formatter_view()
+    */
+    function helptext_field_formatter_info() {
+        return array(    
+            // This formatter changes the background color of the content region.
+            'helptext_default_formatter' => array(
+                'label' => t('help text default'),
+                'field types' => array('helptext_model'),
+            ),
+        );
+    } 
+        
+    /**
+    * Implements hook_field_widget_info().    
+    */
+    function helptext_field_widget_info() {
+        return array(
+          'helptext_text' => array(
+            'label' => t('helptext default widget'),
+            'field types' => array('helptext_model'),
+          ),
+        );
+    }
+      
+    function helptext_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
+        $value = isset($items[$delta]['helpdescription']) ? $items[$delta]['helpdescription'] : '';        
+        $widget = $element;        
+        $widget['#delta'] = $delta;
+                
+        switch ($instance['widget']['type']) {            
+            case 'helptext_text':
+                $widget += array(
+                    '#type' => 'textarea',                    
+                    '#delta' => $delta,
+                    '#default_value' => $value,
+                );
+            break;
+        }
+        
+        $element['helpdescription'] = $widget;
+        return $element; 
+    }     
+       
+     
+    function helptext_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+        $element = array();
+        
+        switch ($display['type']) {    	  
+          case 'helptext_default_formatter':
+            foreach ($items as $delta => $item) {
+              $element[$delta] = array(
+                '#type' => 'html_tag',
+                '#tag' => 'span',      
+                '#attributes' => array(                    
+                    'title'=>$item['helpdescription'],
+                    'class'=>'tooltip',
+                 ),
+                '#value' => $instance['label'],
+                '#attached' => array(
+                    'js' => array(                               
+                               '//code.jquery.com/jquery-1.10.2.js',
+                               '//code.jquery.com/ui/1.11.4/jquery-ui.js',
+                                drupal_get_path('module', 'helptext') . '/helptext.js',
+                        ),
+                ),
+              );
+            }
+            break;
+        }
+        return $element;
+    }

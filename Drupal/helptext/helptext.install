@@ -1,0 +1,26 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the Global Space module.
+ */
+
+/**
+ * Implements hook_field_schema().
+ */
+function helptext_field_schema($field) {
+  $columns = array(   
+    'helpdescription' => array(
+        'type' => 'varchar', 
+        'length' => 255, 
+        'not null' => FALSE
+    )
+  );
+  $indexes = array(
+    'helpdescription' => array('helpdescription'),
+  );
+  return array(
+    'columns' => $columns,
+    'indexes' => $indexes,
+  );
+} 
